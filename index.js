@@ -141,10 +141,10 @@ function shouldPublish(options, localVersion, remoteVersion) {
                     }
                 }
             }
-        }
 
-        if (!shouldPublish) {
-            log.info('Your local version does not satisfy your --on-[major|minor|patch|build] options');
+            if (!shouldPublish) {
+                log.info('Your local version does not satisfy your --on-[major|minor|patch|build] options');
+            }
         }
 
         return shouldPublish;
