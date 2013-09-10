@@ -27,6 +27,9 @@ describe('publish', function () {
         it('should publish because on-minor and on-patch triggers on minor changes', function () {
             assert.ok(figaro.shouldPublish({'on-minor':true, 'on-patch': true}, '2.3.3', '2.2.3'));
         });
+        it('should not publish ignored build identifier', function () {
+            assert.ok(!figaro.shouldPublish({'ignore-suffix': 'devel'}, '0.0.10-devel', '0.0.9'));
+        });
     });
 
     describe('#localPackage', function() {

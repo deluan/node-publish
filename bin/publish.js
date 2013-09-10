@@ -2,7 +2,7 @@
 
 var publish = require('../index');
     nopt = require("nopt"),
-    knownOpts = { 'on-major':Boolean, 'on-minor':Boolean, 'on-patch':Boolean, 'on-build':Boolean },
+    knownOpts = { 'on-major':Boolean, 'on-minor':Boolean, 'on-patch':Boolean, 'on-build':Boolean, 'ignore-suffix':String },
     shorthands = { "?":["--help"], "v":["--version"]},
     options = nopt(knownOpts, shorthands);
 
@@ -21,12 +21,13 @@ if (options.help) {
 
      Options:
 
-     --on-major  Publishes on major version changes.
-     --on-minor  Publishes on minor version changes.
-     --on-patch  Publishes on patch version changes.
-     --on-build  Publishes on build version changes.
-     --version   Print the version of publish.
-     --help      Print this help.
+     --on-major               Publishes on major version changes.
+     --on-minor               Publishes on minor version changes.
+     --on-patch               Publishes on patch version changes.
+     --on-build               Publishes on build version changes.
+     --ignore-suffix <suffix> Do not publish local versions with this build identifier
+     --version                Print the version of publish.
+     --help                   Print this help.
 
      Please report bugs!  https://github.com/cmanzana/node-publish/issues
 

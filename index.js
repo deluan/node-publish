@@ -3,12 +3,12 @@ var npm = require('npm'),
     fs = require('fs');
 
 var onVersions = ['on-major', 'on-minor', 'on-patch', 'on-build'],
-    parsedIndexLookup = { 'on-major':1, 'on-minor':2, 'on-patch':3, 'on-build':4 };
+    parsedIndexLookup = { 'on-major': 1, 'on-minor': 2, 'on-patch': 3, 'on-build': 4 };
 
 log = require('npmlog');
 log.heading = 'publish';
 
-exports.start = function(callback) {
+exports.start = function (callback) {
     npm.load({}, function (err) {
         callback(err);
     });
@@ -28,7 +28,7 @@ function remoteVersion(localPackage, callback) {
         if (err) {
             if (err.code === 'E404') {
                 callback('You have not published yet your first version of this module: publish will do nothing\n' +
-                         'You must publish manually the first release of your module');
+                    'You must publish manually the first release of your module');
             } else {
                 callback(err);
             }
@@ -40,8 +40,8 @@ function remoteVersion(localPackage, callback) {
 }
 exports.remoteVersion = remoteVersion;
 
-exports.publish = function(options, callback) {
-    localPackage(function(err, pkg) {
+exports.publish = function (options, callback) {
+    localPackage(function (err, pkg) {
         if (err) {
             callback('publish can only be performed from the root of npm modules (where the package.json resides)');
         } else {
@@ -50,7 +50,7 @@ exports.publish = function(options, callback) {
                 callback('you have not defined a version in your npm module, check your package.json');
             }
 
-            remoteVersion(pkg, function(err, remoteVersion) {
+            remoteVersion(pkg, function (err, remoteVersion) {
                 if (err) {
                     callback(err);
                 } else if (shouldPublish(options, localVersion, remoteVersion)) {
@@ -58,7 +58,7 @@ exports.publish = function(options, callback) {
                         log.info('running in travis');
                         var npmUser = npmUserCredentials();
                         if (npmUser) {
-                            npmAddUser(npmUser, function(err) {
+                            npmAddUser(npmUser, function (err) {
                                 if (err) {
                                     callback('error while trying to add npm user in travis: ' + err);
                                 } else {
@@ -90,7 +90,7 @@ function npmPublish(callback) {
 
 function npmUserCredentials() {
     if (process.env.NPM_USERNAME && process.env.NPM_PASSWORD && process.env.NPM_EMAIL) {
-        return {'username':process.env.NPM_USERNAME, 'password':process.env.NPM_PASSWORD, 'email':process.env.NPM_EMAIL}
+        return {'username': process.env.NPM_USERNAME, 'password': process.env.NPM_PASSWORD, 'email': process.env.NPM_EMAIL}
     } else {
         return null;
     }
@@ -101,7 +101,7 @@ function isTravis() {
 }
 
 function npmAddUser(npmUser, callback) {
-    npm.registry.adduser(npmUser.username, npmUser.password, npmUser.email, function(err) {
+    npm.registry.adduser(npmUser.username, npmUser.password, npmUser.email, function (err) {
         npm.config.set("email", npmUser.email, "user");
         callback(err);
     });
@@ -124,16 +124,21 @@ function shouldPublish(options, localVersion, remoteVersion) {
 
         var shouldPublish = true;
 
-        for (var i = 0; i < onVersions.length; i++) {
-            var onVersion = onVersions[i];
-            var parsedIndex = parsedIndexLookup[onVersion];
+        if (options["ignore-suffix"] && localVersion[5] === "-" + options["ignore-suffix"]) {
+            log.info('Your local version will be ignored based on the build identifier: ' + localVersion[5]);
+            shouldPublish = false;
+        } else {
+            for (var i = 0; i < onVersions.length; i++) {
+                var onVersion = onVersions[i];
+                var parsedIndex = parsedIndexLookup[onVersion];
 
-            if (options[onVersion]) {
-                if (remoteVersion[parsedIndex] === localVersion[parsedIndex]) {
-                    shouldPublish = false;
-                } else {
-                    shouldPublish = true;
-                    break;
+                if (options[onVersion]) {
+                    if (remoteVersion[parsedIndex] === localVersion[parsedIndex]) {
+                        shouldPublish = false;
+                    } else {
+                        shouldPublish = true;
+                        break;
+                    }
                 }
             }
         }
